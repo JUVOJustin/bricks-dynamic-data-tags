@@ -1,6 +1,6 @@
 # God damn easy Bricks Builder Dynamic Data Tags
-You are a developer and want to add dynamic data tags to your bricks? This package is for you. It allows you to add dynamic data tags to your bricks with ease.
-It automatically registered tags, parses parameters and filters and even allows you to add your very own pattern parsing.
+You are a developer and want to add dynamic data tags to the bricks builder? This package is for you. From now on you can add your dynamic data tags with 3 lines of code.
+It automatically registered tags, parses filters and even allows you to add your very own pattern parsing.
 
 Feature overview:
 - Simple registration of dynamic data tags

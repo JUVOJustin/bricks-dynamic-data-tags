@@ -1,0 +1,34 @@
+{
+  "name": "juvo/bricks-dynamic-data-tags",
+  "description": "Easy to use dynamic data tags for Bricks",
+  "keywords"    : [ "wordpress", "bricksbuilder", "dynamic", "data", "tags" ],
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "php": ">=7.4.0"
+  },
+  "support"     : {
+    "issues" : "https://github.com/JUVOJustin/wp-secure-actions/issues"
+  },
+  "authors": [
+    {
+      "name": "Justin Vogt",
+      "email": "mail@justin-vogt.de",
+      "homepage": "https://justin-vogt.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "juvo\\Bricks_Dynamic_Data_Tags\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^1.10.6",
+    "szepeviktor/phpstan-wordpress": "^v1.1.7",
+    "phpstan/extension-installer": "^1.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  }
+}

@@ -43,18 +43,20 @@ class Dynamic_Data_Tag
         return $tags;
     }
 
-    /**
-     * Callback function for the actual tag. Called in get_tag_value() and render_tag(). This is where you should do your logic.
-     *
-     * @param $post
-     * @param array $variables
-     * @return mixed
-     * @throws Exception
-     */
-    public function run_tag($post, array $variables = []): string {
+	/**
+	 * Callback function for the actual tag. Called in get_tag_value() and render_tag(). This is where you should do your logic.
+	 *
+	 * @param $post
+	 * @param string $context
+	 * @param array $variables
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+    public function run_tag($post, string $context, array $variables = []): string {
         if (is_callable($this->callback)) {
             // Post is always the first parameter
-            $args = array_merge([$post], $variables);
+            $args = array_merge([$post, $context], $variables);
             return call_user_func_array($this->callback, $args);
         } else {
             throw new Exception("The provided callback is not callable.");
@@ -135,7 +137,7 @@ class Dynamic_Data_Tag
             $variables = array_merge($sortedVariables, $variables);
 
             // Run the tag with the variables
-            $value = $this->run_tag($post, array_values($variables));
+            $value = $this->run_tag($post, $context, array_values($variables));
 
             // Sanitize value
             $allowed_tags = wp_kses_allowed_html("juvo/dynamic_data_tag");

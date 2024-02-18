@@ -53,7 +53,7 @@ class Dynamic_Data_Tag
 	 * @return mixed
 	 * @throws Exception
 	 */
-    public function run_tag($post, string $context, array $variables = []): string {
+    public function run_tag($post, string $context, array $variables = []): mixed {
         if (is_callable($this->callback)) {
             // Post is always the first parameter
             $args = array_merge([$post, $context], $variables);
@@ -138,6 +138,14 @@ class Dynamic_Data_Tag
 
             // Run the tag with the variables
             $value = $this->run_tag($post, $context, array_values($variables));
+
+	        // Images need to be returned as array of ideas. If only the id is returned simplify that.
+			if ($context === 'image') {
+				if (is_numeric($value)) {
+					return [$value];
+				}
+				return $value;
+			}
 
             // Sanitize value
             $allowed_tags = wp_kses_allowed_html("juvo/dynamic_data_tag");

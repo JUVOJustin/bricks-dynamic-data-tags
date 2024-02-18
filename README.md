@@ -25,7 +25,7 @@ add_action('init', function() {
 To register a simple dynamic data tag you can use the following code snippet. The first parameter is the tag name, the second parameter is the tag label, the third parameter is the tag group and the last parameter is the callback that returns the tag output.
 ```php
 DDT_Registry::getInstance()
-    ->set('my_tag', 'My Tag', 'My Tag Group', function($post, $filters) {
+    ->set('my_tag', 'My Tag', 'My Tag Group', function($post, $context, $filters) {
         return "Hello World";
     });
 ```
@@ -33,7 +33,7 @@ DDT_Registry::getInstance()
 To register another tag to the same group you simply do:
 ```php
 DDT_Registry::getInstance()
-    ->set('my_tag2', 'My Tag 2', 'My Tag Group', function($post, $filters) {
+    ->set('my_tag2', 'My Tag 2', 'My Tag Group', function($post, $context, $filters) {
         return "Hello World 2";
     });
 ```
@@ -102,7 +102,7 @@ $allowed_tags = apply_filters("juvo/dynamic_data_tag/allowed_html_tags/$tag", $a
 ```php
 // Register 'collection' tag
 DDT_Registry::getInstance()
-    ->set('collection', 'Collection', 'Collections', function($post, $filters) {
+    ->set('collection', 'Collection', 'Collections', function($post, $context, $filters) {
         return "<iframe src='" . get_permalink($post) . "'></iframe>";
     });
 

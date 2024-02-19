@@ -168,7 +168,7 @@ class Dynamic_Data_Tag
      */
     private function parse_tag(string $content): array
     {
-        $pattern = "/{" .$this->tag. "(?::(?<filters>[1-9a-zA-Z ]+(?::[1-9a-zA-Z ]+)*))?}/";
+        $pattern = "/{" .$this->tag. "(?::(?<filters>[1-9a-zA-Z_]+(?::[1-9a-zA-Z_]+)*))?}/";
         $pattern = apply_filters("juvo/dynamic_data_tag/parse_tag", $pattern, $this->tag);
         $pattern = apply_filters("juvo/dynamic_data_tag/parse_tag/$this->tag", $pattern, $this->tag);
 

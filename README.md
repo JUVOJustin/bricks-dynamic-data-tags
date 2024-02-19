@@ -54,7 +54,7 @@ The `juvo/dynamic_data_tag/parse_tag` filter allows you to modify how all tags a
 // Adds "modifier" as a named capturing group to the tag pattern
 add_filter("juvo/dynamic_data_tag/parse_tag", function($pattern, $tag) {
     $pattern = str_replace("}/", "", $pattern);
-    return $pattern . "(\~(?<modifier>[1-9a-zA-Z ]+(\~[1-9a-zA-Z ]+)*))?}/";
+    return $pattern . "(\~(?<modifier>[1-9a-zA-Z_]+(\~[1-9a-zA-Z_]+)*))?}/";
 }, 10, 2);
 ```
 ### Filter the tag pattern by tag name
@@ -109,7 +109,7 @@ DDT_Registry::getInstance()
 // Add custom dynamic data tag structure by adding a modifier group. Tag will look like this: {collection~modifier1~modifier2}
 add_filter("juvo/dynamic_data_tag/parse_tag/collection", function($pattern, $tag) {
     $pattern = str_replace("}/", "", $pattern);
-    return $pattern . "(\~(?<modifier>[1-9a-zA-Z ]+(\~[1-9a-zA-Z ]+)*))?}/";
+    return $pattern . "(\~(?<modifier>[1-9a-zA-Z_]+(\~[1-9a-zA-Z_]+)*))?}/";
 }, 10, 2);
 
 // Split the modifier by ~. Needed for multiple modifiers

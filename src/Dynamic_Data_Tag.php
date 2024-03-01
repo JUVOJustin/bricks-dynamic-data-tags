@@ -147,10 +147,17 @@ class Dynamic_Data_Tag
                 return $value;
             }
 
-            // Sanitize value
-            $allowed_tags = wp_kses_allowed_html("juvo/dynamic_data_tag");
-            $allowed_tags = apply_filters("juvo/dynamic_data_tag/allowed_html_tags/$this->tag", $allowed_tags);
-            $value = wp_kses($value, $allowed_tags);
+            // If the value is null, replace it with an empty string
+            if ($value === null) {
+                $value = "";
+            }
+
+            // Sanitize value if not empty
+            if (is_string($value)) {
+                $allowed_tags = wp_kses_allowed_html("juvo/dynamic_data_tag");
+                $allowed_tags = apply_filters("juvo/dynamic_data_tag/allowed_html_tags/$this->tag", $allowed_tags);
+                $value = wp_kses($value, $allowed_tags, []);
+            }
 
             // Replace the tag with the transformed value
             $content = str_replace($match_groups[0], $value, $content);

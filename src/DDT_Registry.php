@@ -9,7 +9,7 @@ class DDT_Registry
     private array $storage = [];
 
     private function __construct() {
-        add_action('wp', function() {
+        add_action('init', function() {
             $this->registerDataTags();
         }, 99);
     }

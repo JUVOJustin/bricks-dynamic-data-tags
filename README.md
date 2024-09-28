@@ -92,30 +92,21 @@ add_filter("wp_kses_allowed_html", function($allowedtags, $context) {
         }, 10, 2);
 ```
 
-To allow different html tags per dynamic data tag there is also a special hook. As you can see in the code snippet, general tags are filtered first and then passed to a tag specific filter. 
+To allow different html tags per dynamic data tag there is also a special hook. As you can see in the code snippet, general tags are filtered first and then passed to a tag specific filter.
 ```php
 $allowed_tags = wp_kses_allowed_html("juvo/dynamic_data_tag");
 $allowed_tags = apply_filters("juvo/dynamic_data_tag/allowed_html_tags/$tag", $allowed_tags);
 ```
 
-## Full customization example:
+## Advanced examples:
+### iFrame
+Registers a dynamic data tag that displays the current post embedded in an iFrame.
 ```php
-// Register 'collection' tag
+// Register '{collection}' tag
 DDT_Registry::getInstance()
     ->set('collection', 'Collection', 'Collections', function($post, $context, array $filters = []) {
         return "<iframe src='" . get_permalink($post) . "'></iframe>";
     });
-
-// Add custom dynamic data tag structure by adding a modifier group. Tag will look like this: {collection~modifier1~modifier2}
-add_filter("juvo/dynamic_data_tag/parse_tag/collection", function($pattern, $tag) {
-    $pattern = str_replace("}/", "", $pattern);
-    return $pattern . "(\~(?<modifier>[0-9a-zA-Z_-]+(\~[0-9a-zA-Z_-]+)*))?}/";
-}, 10, 2);
-
-// Split the modifier by ~. Needed for multiple modifiers
-add_filter("juvo/dynamic_data_tag/parse_tag/pattern_modifier", function($value) {
-    return explode("~", $value);
-});
 
 // Add custom allowed html tags for the collection tag. In this case we allow iframes.
 add_filter("juvo/dynamic_data_tag/allowed_html_tags/collection", function($allowedtags) {
@@ -129,5 +120,55 @@ add_filter("juvo/dynamic_data_tag/allowed_html_tags/collection", function($allow
         'title' => true,
     ];
     return $allowedtags;
+});
+```
+### Post Data
+Register a dynamic data tag {post_data} to display post data. A filter allows to select which data to display. Another custom filter "bold" allows to mark certain data to be bolded.
+The tag can be used like this: `{post_data:title:post_type~bold=post_type~bold=title}` will be displayed as "**Title**, Post Type".
+```php
+DDT_Registry::getInstance()->set(
+    'post_data',
+    'Post Data',
+    'Posts',
+    function( \WP_Post $post, string $context, array $filters= [], array $bold = [] ) {
+
+        $output = [];
+        foreach ( $filters as $filter ) {
+            switch ( $filter ) {
+                case 'title':
+                    $output['title'] = get_the_title();
+                    break;
+                case 'excerpt':
+                    $output['excerpt'] = get_the_excerpt();
+                    break;
+                case 'content':
+                    $output['content'] = get_the_content();
+                    break;
+                case 'post_type':
+                    $output['post_type'] = get_post_type();
+                    break;
+            }
+        }
+
+        // Add some of the filtered values tobe bold
+        foreach($bold as $key) {
+            if (in_array($key, $filters)) {
+                $output[$key] = "<b>".$output[$key]."</b>";
+            }
+        }
+
+        return implode( ', ', $output );
+    }
+);
+
+// Add a custom pattern to introduce a "bold" capture group.
+add_filter("juvo/dynamic_data_tag/parse_tag/post_data", function($pattern, $tag) {
+    $pattern = str_replace("}/", "", $pattern);
+    return $pattern . "(?:~bold=(?<bold>[0-9a-zA-Z_-]+))*}/"; // use ~bold= as separator
+}, 10, 2);
+
+// To allow the freshly added "bold" capture group to have multiple values we need to split the values by the separator
+add_filter("juvo/dynamic_data_tag/parse_tag/pattern_bold", function($value) {
+    return explode("~bold=", $value);
 });
 ```

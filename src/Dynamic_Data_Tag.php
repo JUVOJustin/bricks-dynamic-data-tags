@@ -122,6 +122,13 @@ class Dynamic_Data_Tag
                         break;
                 }
 
+				// Enforce parameters to be an array
+				if (is_string($value)) {
+					$value = [
+						$value
+					];
+				}
+
                 $variables[$key] = $value;
             }
 

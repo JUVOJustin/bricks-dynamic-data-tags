@@ -137,7 +137,17 @@ class Dynamic_Data_Tag
             $variables = array_merge($sortedVariables, $variables);
 
             // Run the tag with the variables
-            $value = $this->run_tag($post, $context, array_values($variables));
+            try {
+                $value = $this->run_tag( $post, $context, array_values( $variables ) );
+            } catch ( Exception $e ) {
+                $value = "Error rendering Custom DDT '{$this->tag}': " . $e->getMessage();
+                error_log( $value );
+
+                // If user is not an admin return an empty string. Display the error for admins.
+                if ( ! current_user_can( 'administrator' ) ) {
+                    return "";
+                }
+            }
 
             // Images need to be returned as array of ideas. If only the id is returned simplify that.
             if ($context === 'image') {

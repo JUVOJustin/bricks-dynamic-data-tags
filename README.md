@@ -40,15 +40,13 @@ DDT_Registry::getInstance()
 
 [![Bricks Builder Dynamic Data Tags List](https://i.postimg.cc/bNP0y8Tr/Capture-2024-02-17-140801.png)](https://postimg.cc/7bBJ9Fjr)
 
-
-## Hooks
-### Filter tags that get registered
+## Filter tags that get registered
 The `juvo/register_dynamic_tags` filter allows you to modify the tags that get registered. This filter passes the at this point added data tags as array. You can use this to remove tags.
 ```php
 apply_filters('juvo/dynamic_tags/register', $tags);
 ```
 
-### Filter the tag pattern
+## Filter the tag pattern
 The `juvo/dynamic_data_tag/parse_tag` filter allows you to modify how all tags are parsed. This filter passes the tag pattern and the tag name as arguments. It allows you to parse a custom structure of for your data tags. To add new variables that are passed to the callback make sure to add them as a [named capturing group](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Named_capturing_group) with the regex.
 ```php
 // Adds "modifier" as a named capturing group to the tag pattern
@@ -57,6 +55,12 @@ add_filter("juvo/dynamic_data_tag/parse_tag", function($pattern, $tag) {
     return $pattern . "(\~(?<modifier>[0-9a-zA-Z_-]+(\~[0-9a-zA-Z_-]+)*))?}/";
 }, 10, 2);
 ```
+
+Your callback now needs one more parameter:
+```
+DDT_Registry::getInstance()->set( 'single_tag', 'Single Tag', 'Custom Tags', function( $post, $context, array $filters = [], array $modifier = [] )
+``` 
+
 ### Filter the tag pattern by tag name
 The `juvo/dynamic_data_tag/parse_tag` filter allows you to modify the tag pattern for a specific tag.
 ```php
@@ -72,7 +76,45 @@ add_filter("juvo/dynamic_data_tag/parse_tag/pattern_modifier", function($value) 
 });
 ```
 
-### Modify allowed html tags
+### Use named filters
+It is possible to register dynamic data tags like these: `{single_tag:tag=tag_slug:link=true}`. In your callback you need to parse the filter values to work with key value pairs. This example allows you to display tags, filter which tag to display by slug and filter the tags name should be wrapped in a link to the term itself.
+```php
+DDT_Registry::getInstance()->set( 'single_tag', 'Single Tag', 'Custom Tags', function( $post, $context, array $filters = [] ) {
+    // Parse filters to be key-value pairs
+    $parsed_filters = [];
+    foreach ( $filters as &$item ) {
+        list( $key, $value ) = explode( '=', $item );
+        $parsed_filters[ $key ] = $value;
+    }
+    $filters = $parsed_filters;
+    
+    $tags = get_the_terms( get_the_ID(), 'post_tag' );
+    if ( empty( $tags ) || is_wp_error( $tags ) ) {
+        return '';
+    }
+    
+    // Filter to select a specific tag
+    $selected_tag = $filters['tag'] ?? '';
+    $output       = [];
+    
+    foreach ( $tags as $tag ) {
+        if ((!empty($selected_tag) && $tag->slug === $selected_tag) || empty($selected_tag)) {
+    
+            // Check if we need links or not
+            if ( isset( $filters['link'] ) && $filters['link'] === 'true' ) {
+                $output[] = '<a href="' . esc_url( get_term_link( $tag ) ) . '">' . esc_html( $tag->name ) . '</a>';
+            } else {
+                $output[] = esc_html( $tag->name );
+            }
+        }
+    }
+    
+    return implode( ', ', $output );
+    } );
+```
+In this example
+
+## Modify allowed html tags
 The output of the callback is filtered with `wp_kses` to prevent XSS attacks. You can modify the allowed tags with the `wp_kses_allowed_html` filter. This filter passes the allowed tags and the context as arguments. You can use this to modify allowed html tags.
 ```php
 add_filter("wp_kses_allowed_html", function($allowedtags, $context) {

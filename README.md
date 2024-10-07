@@ -8,6 +8,9 @@ Feature overview:
 - Custom pattern parsing
 - Output Filtering with wp_kses
 
+## Quick Demo using within Child Theme
+[<img src="https://img.youtube.com/vi/pJ4j5iZKKV0/maxresdefault.jpg" width="50%">](https://youtu.be/pJ4j5iZKKV0)
+
 ## Installation
 To install the package you can use composer. Run the following command in your terminal:
 ```bash
